@@ -5,7 +5,11 @@ import com.baidu.shop.base.Result;
 import com.baidu.shop.entity.CategoryEntity;
 import com.baidu.shop.mapper.CategoryMapper;
 import com.baidu.shop.service.CategoryService;
+import com.baidu.shop.utils.ObjectUtil;
+import com.google.gson.JsonObject;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -22,6 +26,39 @@ public class CategoryServiceImpl extends BaseApiService implements CategoryServi
 
     @Resource
     private CategoryMapper categoryMapper;
+
+
+    @Transactional
+    @Override
+    public Result<JsonObject> delCateGoryById(Integer id) {
+        //判断Id是否合法
+        if (ObjectUtil.isNull(id)) return this.setResultError("Id不合法");
+
+        //根据Id查询数据
+        CategoryEntity categoryEntity = categoryMapper.selectByPrimaryKey(id);
+
+        //判断对象不为空
+        if (ObjectUtil.isNull(categoryEntity)) return this.setResultError("数据不存在");
+
+        //判断当前节点是否为父节点
+        if (categoryEntity.getIsParent() == 1) return this.setResultError("当前节点为父节点");
+
+        //通过被删除节点查询数据
+        Example example = new Example(CategoryEntity.class);
+        example.createCriteria().andEqualTo("parentId",categoryEntity.getParentId());
+        List<CategoryEntity> categoryEntities = categoryMapper.selectByExample(example);
+
+        //如果查询到的数据不大于一天  那么将父节点状态改为叶子节点
+        if (categoryEntities.size() <= 1){
+            CategoryEntity categoryEntity1 = new CategoryEntity();
+            categoryEntity1.setIsParent(0);
+            categoryEntity1.setId(categoryEntity.getParentId());
+            categoryMapper.updateByPrimaryKeySelective(categoryEntity1);
+        }
+
+        categoryMapper.deleteByPrimaryKey(id);
+        return this.setResultSuccess();
+    }
 
     @Override
     public Result<List<CategoryEntity>> getCategoryByPid(Integer pid) {
