@@ -21,6 +21,10 @@ import java.util.List;
  **/
 @Api
 public interface CategoryService {
+    @ApiOperation(value = "通过品牌Id查询分类信息")
+    @GetMapping(value = "/category/brand")
+    Result<List<CategoryEntity>> getCategoryByBrandId(Integer brandId);
+
     @ApiOperation(value = "分类查询")
     @GetMapping(value = "category/list")
     Result<List<CategoryEntity>> getCategoryByPid(Integer pid);
