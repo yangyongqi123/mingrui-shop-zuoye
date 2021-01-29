@@ -3,7 +3,9 @@ package com.baidu.shop.service;
 import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.SpecGroupDTO;
+import com.baidu.shop.dto.SpecParamDTO;
 import com.baidu.shop.entity.SpecGroupEntity;
+import com.baidu.shop.entity.SpecParamEntity;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,4 +34,8 @@ public interface SpecificationService {
     @ApiOperation("删除规则数据")
     @DeleteMapping("specgroup/delete")
     Result<JSONObject> deleteSpecGroupInfo(Integer id);
+
+    @ApiOperation("通过条件查询规则参数")
+    @GetMapping("specparam/getSpecParamInfo")
+    Result<List<SpecParamEntity>> getSpecParamInfo(SpecParamDTO specParamDTO);
 }

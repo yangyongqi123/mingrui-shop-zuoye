@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.baidu.shop.base.BaseApiService;
 import com.baidu.shop.base.Result;
 import com.baidu.shop.dto.SpecGroupDTO;
+import com.baidu.shop.dto.SpecParamDTO;
 import com.baidu.shop.entity.SpecGroupEntity;
+import com.baidu.shop.entity.SpecParamEntity;
 import com.baidu.shop.mapper.SpecGroupMapper;
+import com.baidu.shop.mapper.SpecParamMapper;
 import com.baidu.shop.service.SpecificationService;
 import com.baidu.shop.utils.BaiduBeanUtils;
 import com.baidu.shop.utils.ObjectUtil;
@@ -27,6 +30,20 @@ import java.util.List;
 public class SpecificationServiceImpl extends BaseApiService implements SpecificationService {
     @Resource
     private SpecGroupMapper specGroupMapper;
+
+    @Resource
+    private SpecParamMapper specParamMapper;
+
+    @Override
+    public Result<List<SpecParamEntity>> getSpecParamInfo(SpecParamDTO specParamDTO) {
+        SpecParamEntity specParamEntity = BaiduBeanUtils.copyProperties(specParamDTO, SpecParamEntity.class);
+
+        Example example = new Example(SpecParamEntity.class);
+        example.createCriteria().andEqualTo("groupId",specParamEntity.getGroupId());
+        List<SpecParamEntity> specParamEntities = specParamMapper.selectByExample(example);
+
+        return this.setResultSuccess(specParamEntities);
+    }
 
     @Transactional
     @Override
