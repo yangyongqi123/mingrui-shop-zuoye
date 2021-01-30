@@ -34,6 +34,30 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     @Resource
     private SpecParamMapper specParamMapper;
 
+    @Transactional
+    @Override
+    public Result<JSONObject> deleteSpecParamInfo(Integer id) {
+        specParamMapper.deleteByPrimaryKey(id);
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<JSONObject> editSpecParamInfo(SpecParamDTO specParamDTO) {
+        SpecParamEntity specParamEntity = BaiduBeanUtils.copyProperties(specParamDTO, SpecParamEntity.class);
+        specParamMapper.updateByPrimaryKeySelective(specParamEntity);
+        return this.setResultSuccess();
+    }
+
+    @Transactional
+    @Override
+    public Result<JSONObject> saveSpecParamInfo(SpecParamDTO specParamDTO) {
+        SpecParamEntity specParamEntity = BaiduBeanUtils.copyProperties(specParamDTO, SpecParamEntity.class);
+        if (null == specParamEntity.getName()) return this.setResultError("参数名不能为空");
+        specParamMapper.insertSelective(specParamEntity);
+        return this.setResultSuccess();
+    }
+
     @Override
     public Result<List<SpecParamEntity>> getSpecParamInfo(SpecParamDTO specParamDTO) {
         SpecParamEntity specParamEntity = BaiduBeanUtils.copyProperties(specParamDTO, SpecParamEntity.class);
@@ -48,6 +72,12 @@ public class SpecificationServiceImpl extends BaseApiService implements Specific
     @Transactional
     @Override
     public Result<JSONObject> deleteSpecGroupInfo(Integer id) {
+        //判断规格组当中如果有参数不能删除
+        Example example = new Example(SpecParamEntity.class);
+        example.createCriteria().andEqualTo("groupId",id);
+        List<SpecParamEntity> specParamEntities = specParamMapper.selectByExample(example);
+        if (specParamEntities.size() > 0) return  this.setResultError("已有参数不能删除");
+
         specGroupMapper.deleteByPrimaryKey(id);
         return this.setResultSuccess();
     }

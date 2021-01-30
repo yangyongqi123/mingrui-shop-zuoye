@@ -38,4 +38,16 @@ public interface SpecificationService {
     @ApiOperation("通过条件查询规则参数")
     @GetMapping("specparam/getSpecParamInfo")
     Result<List<SpecParamEntity>> getSpecParamInfo(SpecParamDTO specParamDTO);
+
+    @ApiOperation("新增规则参数")
+    @PostMapping("specparam/saveSpecParamInfo")
+    Result<JSONObject>  saveSpecParamInfo(@RequestBody SpecParamDTO specParamDTO);
+
+    @ApiOperation("修改规则参数")
+    @PutMapping("specparam/saveSpecParamInfo")
+    Result<JSONObject>  editSpecParamInfo(@RequestBody SpecParamDTO specParamDTO);
+
+    @ApiOperation("删除规则参数")
+    @DeleteMapping("specparam/delete")
+    Result<JSONObject>  deleteSpecParamInfo(Integer id);
 }
